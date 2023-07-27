@@ -1,5 +1,6 @@
 package com.ivo.tasevski.quartzschedulerdemo.app;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
@@ -21,17 +22,27 @@ import java.util.*;
 public class GreetingSchedulingService {
 
     private final Scheduler scheduler;
+    private final GreetingRepository greetingRepository;
+    private final LoggingService loggingService;
 
+    @Transactional
     public <T extends Job> void scheduleGreeting(CreateGreetingJobCmd cmd)
             throws SchedulerException {
 
+        Greeting greeting = new Greeting()
+                .setMessage("Greetings " + cmd.getFirstName() + "! This is a scheduled greeting by Quartz.");
+        greetingRepository.save(greeting);
+
         Map<String, Object> params = new HashMap<>();
-        params.put("firstName", cmd.getFirstName());
+        params.put("uuid", greeting.getId());
 
         final JobDetail jobDetail = buildJobDetail(GreetingJob.class, params);
         final Trigger trigger = buildTrigger(jobDetail.getKey(), LocalTime.now().plusSeconds(cmd.getDelayInSeconds()));
 
         scheduler.scheduleJob(jobDetail, trigger);
+
+        // this can be used to test behavior when exception is thrown
+        loggingService.log(jobDetail, trigger);
     }
 
     public List<JobResponse> findAllScheduledJobs() throws SchedulerException {

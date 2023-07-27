@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
 
-  <include file="classpath:db/quartz.xml"/>
+    <include file="classpath:db/quartz.xml"/>
+
+    <changeSet id="1" author="Ivo Tasevski">
+        <createTable tableName="greeting">
+            <column name="id" type="VARCHAR(255)">
+                <constraints primaryKey="true" primaryKeyName="greeting_pk"/>
+            </column>
+            <column name="message" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
 
 </databaseChangeLog>
